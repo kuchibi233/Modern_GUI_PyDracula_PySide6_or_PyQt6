@@ -22,11 +22,38 @@ import platform
 # ///////////////////////////////////////////////////////////////
 from modules import *
 from widgets import *
+import psutil
+import threading
+
+import time
 os.environ["QT_FONT_DPI"] = "96" # FIX Problem for High DPI and Scale above 100%
 
 # SET AS GLOBAL WIDGETS
 # ///////////////////////////////////////////////////////////////
 widgets = None
+class NewThread(QThread):
+    finishSignal=Signal(str)
+    def __init__(self,parent=None):
+        super(NewThread,self).__init__(parent)
+
+    if os.path.exists(f'./computer_info.csv'):
+        pass
+    else:
+        with open(r'./computer_info.csv','w') as f:
+            pass
+    def run(self):
+        
+        timer=0
+        while True:
+            timer += 1
+            cpu_percent=psutil.cpu_percent(interval=1)
+            cpu_info=cpu_percent
+            virtual_memory=psutil.virtual_memory()
+            memory_percent=virtual_memory.percent
+            with open(r'./computer_info.csv','a') as f:
+                f.write(f"{timer},{cpu_info},{memory_percent}\n")
+            time.sleep(2)
+            self.finishSignal.emit("1")
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -45,8 +72,8 @@ class MainWindow(QMainWindow):
 
         # APP NAME
         # ///////////////////////////////////////////////////////////////
-        title = "PyDracula - Modern GUI"
-        description = "PyDracula APP - Theme with colors based on Dracula for Python."
+        title = "嗷呜，我是山里灵活的狗"
+        description = "嗷呜，我是山里灵活的狗"
         # APPLY TEXTS
         self.setWindowTitle(title)
         widgets.titleRightInfo.setText(description)
@@ -71,6 +98,12 @@ class MainWindow(QMainWindow):
         widgets.btn_widgets.clicked.connect(self.buttonClick)
         widgets.btn_new.clicked.connect(self.buttonClick)
         widgets.btn_save.clicked.connect(self.buttonClick)
+        widgets.btn_message.clicked.connect(self.buttonClick)
+        widgets.btn_computer.clicked.connect(self.buttonClick)
+        widgets.btn_computer.clicked.connect(self.buttonClick)
+        widgets.pushButton_show.clicked.connect(self.start_computer_info)
+
+
 
         # EXTRA LEFT BOX
         def openCloseLeftBox():
@@ -89,7 +122,13 @@ class MainWindow(QMainWindow):
 
         # SET CUSTOM THEME
         # ///////////////////////////////////////////////////////////////
+        if getattr(sys,'frozen',False):
+            absPath=os.path.driname(os.path.abspath(sys.executable))
+        elif __file__:
+            absPath=os.path.dirname(os.path.abspath(__file__))
         useCustomTheme = False
+        self.useCustomTheme=useCustomTheme
+        self.absPath=absPath
         themeFile = "themes\py_dracula_light.qss"
 
         # SET THEME AND HACKS
@@ -109,6 +148,14 @@ class MainWindow(QMainWindow):
     # BUTTONS CLICK
     # Post here your functions for clicked buttons
     # ///////////////////////////////////////////////////////////////
+    def start_computer_info(self):
+        self.thread1=NewThread()
+        self.thread1.finishSignal.connect(self.data_display)
+        self.thread1.start()
+
+    def data_display(self,str_):
+        print(str_)
+
     def buttonClick(self):
         # GET BUTTON CLICKED
         btn = self.sender()
@@ -131,10 +178,27 @@ class MainWindow(QMainWindow):
             widgets.stackedWidget.setCurrentWidget(widgets.new_page) # SET PAGE
             UIFunctions.resetStyle(self, btnName) # RESET ANOTHERS BUTTONS SELECTED
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet())) # SELECT MENU
+        
+        if btnName == "btn_computer":
+            widgets.stackedWidget.setCurrentWidget(widgets.computer_info) # SET PAGE
+            UIFunctions.resetStyle(self, btnName) # RESET ANOTHERS BUTTONS SELECTED
+            btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet())) # SELECT MENU
 
         if btnName == "btn_save":
-            print("Save BTN clicked!")
+            # print("Save BTN clicked!")
+            QMessageBox.information(self,"提示","山里灵活不在家，下次再试试吧",QMessageBox.Yes)
 
+        if btnName == "btn_message":
+            if self.useCustomTheme:
+                themeFile=os.path.abspath(os.path.join(self.absPath,"themes\py_dracula_dark.qss"))
+                UIFunctions.theme(self,themeFile,True)
+                AppFunctions.setThemeHack(self)
+                self.useCustomTheme=False
+            else:
+                themeFile=os.path.abspath(os.path.join(self.absPath,"themes\py_dracula_light.qss"))
+                UIFunctions.theme(self,themeFile,True)
+                AppFunctions.setThemeHack(self)
+                self.useCustomTheme=True
         # PRINT BTN NAME
         print(f'Button "{btnName}" pressed!')
 
