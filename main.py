@@ -17,14 +17,13 @@
 import sys
 import os
 import platform
-
 # IMPORT / GUI AND MODULES AND WIDGETS
 # ///////////////////////////////////////////////////////////////
 from modules import *
 from widgets import *
 import psutil
 import threading
-
+from PySide6.QtCharts import QChart,QChartView,QLineSeries
 import time
 os.environ["QT_FONT_DPI"] = "96" # FIX Problem for High DPI and Scale above 100%
 
@@ -102,8 +101,10 @@ class MainWindow(QMainWindow):
         widgets.btn_computer.clicked.connect(self.buttonClick)
         widgets.btn_computer.clicked.connect(self.buttonClick)
         widgets.pushButton_show.clicked.connect(self.start_computer_info)
-
-
+        widgets.pushButton_clear.clicked.connect(self.clear_computer_info)
+        widgets.pushButton_file.clicked.connect(self.open_guide_book)
+        widgets.pushButton_baidu.clicked.connect(self.open_web)
+        widgets.pushButton_picture.clicked.connect(self.change_pic)
 
         # EXTRA LEFT BOX
         def openCloseLeftBox():
@@ -123,7 +124,7 @@ class MainWindow(QMainWindow):
         # SET CUSTOM THEME
         # ///////////////////////////////////////////////////////////////
         if getattr(sys,'frozen',False):
-            absPath=os.path.driname(os.path.abspath(sys.executable))
+            absPath=os.path.dirname(os.path.abspath(sys.executable))
         elif __file__:
             absPath=os.path.dirname(os.path.abspath(__file__))
         useCustomTheme = False
@@ -154,7 +155,22 @@ class MainWindow(QMainWindow):
         self.thread1.start()
 
     def data_display(self,str_):
-        print(str_)
+        with open(r'./computer_info.csv','r') as f:
+            reader=f.readlines()
+            reader_last = reader[-1].replace('\n','').split(',')
+            col=int(reader_last[0])
+            cpu=float(reader_last[1])
+            memory=float(reader_last[2])
+
+        self.seriesS.append(col,cpu)
+        self.seriesL.append(col,memory)
+        self.chart=QChart()
+        self.chart.setTitle("设备资源图")
+        self.chart.addSeries(self.seriesS)
+        self.chart.addSeries(self.seriesL)
+        self.chart.createDefaultAxes()
+        widgets.graphicsView.setChart(self.chart)
+
 
     def buttonClick(self):
         # GET BUTTON CLICKED
@@ -180,10 +196,17 @@ class MainWindow(QMainWindow):
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet())) # SELECT MENU
         
         if btnName == "btn_computer":
+            
             widgets.stackedWidget.setCurrentWidget(widgets.computer_info) # SET PAGE
             UIFunctions.resetStyle(self, btnName) # RESET ANOTHERS BUTTONS SELECTED
             btn.setStyleSheet(UIFunctions.selectMenu(btn.styleSheet())) # SELECT MENU
 
+            self.seriesS=QLineSeries()
+            self.seriesL=QLineSeries()
+            self.seriesS.setName("cpu")
+            self.seriesL.setName("memory")
+
+        
         if btnName == "btn_save":
             # print("Save BTN clicked!")
             QMessageBox.information(self,"提示","山里灵活不在家，下次再试试吧",QMessageBox.Yes)
@@ -208,7 +231,8 @@ class MainWindow(QMainWindow):
     def resizeEvent(self, event):
         # Update Size Grips
         UIFunctions.resize_grips(self)
-
+    def clear_computer_info(self):
+        self.seriesS.clear()
     # MOUSE CLICK EVENTS
     # ///////////////////////////////////////////////////////////////
     def mousePressEvent(self, event):
@@ -220,7 +244,28 @@ class MainWindow(QMainWindow):
             print('Mouse click: LEFT CLICK')
         if event.buttons() == Qt.RightButton:
             print('Mouse click: RIGHT CLICK')
-
+    def open_guide_book(self):
+        import webbrowser
+        webbrowser.open("说明书"+".docx")
+    
+    def open_web(self):
+        import webbrowser
+        webbrowser.open('www.baidu.com')
+    
+    def change_pic(self):
+        url_list=[
+            "./pic/1.jpg",
+            "./pic/2.jpg",
+            "./pic/3.jpg",
+            "./pic/4.jpg",
+            "./pic/5.jpg",
+        ]
+        import random
+        index=random.randint(0,4)
+        lb1=widgets.label
+        pix=QPixmap(url_list[index]).scaled(lb1.size(),aspectMode=Qt.KeepAspectRatio)
+        lb1.setPixmap(pix)
+        lb1.repaint()
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon("icon.ico"))

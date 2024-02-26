@@ -712,8 +712,11 @@ class Ui_MainWindow(object):
 
         self.btn_computer = QPushButton(self.topMenu)
         self.btn_computer.setObjectName(u"btn_computer")
+        sizePolicy.setHeightForWidth(self.btn_computer.sizePolicy().hasHeightForWidth())
+        self.btn_computer.setSizePolicy(sizePolicy)
         self.btn_computer.setMinimumSize(QSize(0, 45))
-        self.btn_computer.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-devices.png)")
+        self.btn_computer.setCursor(QCursor(Qt.PointingHandCursor))
+        self.btn_computer.setStyleSheet(u"background-image: url(:/icons/images/icons/cil-devices.png);")
 
         self.verticalLayout_8.addWidget(self.btn_computer)
 
@@ -1225,7 +1228,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 345, 218))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 218, 218))
         self.scrollAreaWidgetContents.setStyleSheet(u" QScrollBar:vertical {\n"
 "	border: none;\n"
 "    background: rgb(52, 59, 72);\n"
@@ -1432,6 +1435,24 @@ class Ui_MainWindow(object):
         self.new_page.setObjectName(u"new_page")
         self.verticalLayout_20 = QVBoxLayout(self.new_page)
         self.verticalLayout_20.setObjectName(u"verticalLayout_20")
+        self.pushButton_file = QPushButton(self.new_page)
+        self.pushButton_file.setObjectName(u"pushButton_file")
+        self.pushButton_file.setStyleSheet(u"background-color: rgb(52, 59, 72);")
+
+        self.verticalLayout_20.addWidget(self.pushButton_file)
+
+        self.pushButton_baidu = QPushButton(self.new_page)
+        self.pushButton_baidu.setObjectName(u"pushButton_baidu")
+        self.pushButton_baidu.setStyleSheet(u"background-color: rgb(52, 59, 72);")
+
+        self.verticalLayout_20.addWidget(self.pushButton_baidu)
+
+        self.pushButton_picture = QPushButton(self.new_page)
+        self.pushButton_picture.setObjectName(u"pushButton_picture")
+        self.pushButton_picture.setStyleSheet(u"background-color: rgb(52, 59, 72);")
+
+        self.verticalLayout_20.addWidget(self.pushButton_picture)
+
         self.label = QLabel(self.new_page)
         self.label.setObjectName(u"label")
         self.label.setAlignment(Qt.AlignCenter)
@@ -1580,7 +1601,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.stackedWidget.setCurrentIndex(1)
+        self.stackedWidget.setCurrentIndex(3)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -1708,6 +1729,9 @@ class Ui_MainWindow(object):
         ___qtablewidgetitem23.setText(QCoreApplication.translate("MainWindow", u"Line", None));
         self.tableWidget.setSortingEnabled(__sortingEnabled)
 
+        self.pushButton_file.setText(QCoreApplication.translate("MainWindow", u"\u6253\u5f00\u672c\u5730\u8bf4\u660e\u6587\u4ef6", None))
+        self.pushButton_baidu.setText(QCoreApplication.translate("MainWindow", u"\u6253\u5f00\u767e\u5ea6", None))
+        self.pushButton_picture.setText(QCoreApplication.translate("MainWindow", u"\u5207\u6362\u56fe\u7247", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"NEW PAGE TEST", None))
         self.btn_message.setText(QCoreApplication.translate("MainWindow", u"Change", None))
         self.btn_print.setText(QCoreApplication.translate("MainWindow", u"Print", None))
